@@ -142,7 +142,9 @@ class Model(object):
         self.vocab_size = len(vocab)
         self.embedding_dim = self.params.word_embedding_weights.shape[1]
         self.embedding_layer_dim = self.params.embed_to_hid_weights.shape[1]
+        # here is 3D/D = 3
         self.context_len = self.embedding_layer_dim // self.embedding_dim
+        # here is N_H, which is number of hidden layer
         self.num_hid = self.params.embed_to_hid_weights.shape[0]
 
     def copy(self):
@@ -169,6 +171,9 @@ class Model(object):
 
             y_i = e^{z_i} / \sum_j e^{z_j}.
 
+
+            
+
         This function should return a batch_size x vocab_size matrix, where the (i, j) entry
         is dC / dz_j computed for the ith training case, where C is the loss function
 
@@ -181,7 +186,7 @@ class Model(object):
                 i.e. the (i, j) entry is 1 if the i'th word is j, and 0 otherwise."""
         
         ###########################   YOUR CODE HERE  ##############################
-
+        return output_activations - expanded_target_batch
 
         ############################################################################
 
@@ -223,7 +228,7 @@ class Model(object):
         # softmax unit does not affect the outputs. So subtract the maximum to
         # make all inputs <= 0. This prevents overflows when computing their exponents.
         inputs_to_softmax -= inputs_to_softmax.max(1).reshape((-1, 1))
-
+        # e^(z_i-z_max)/sum(e^(z_j-z_max)) = e^z_i / sum(e^z_j) * e^(-z_max) / e^(-z_max)
         output_layer_state = np.exp(inputs_to_softmax)
         output_layer_state /= output_layer_state.sum(1).reshape((-1, 1))
 
@@ -243,7 +248,14 @@ class Model(object):
         computations for hid_to_output_weights_grad, output_bias_grad, embed_to_hid_weights_grad,
         and hid_bias_grad. See the documentation for the Params class for a description of what
         these matrices represent."""
-        
+
+        # matrix size:
+        # loss_derivative: B x N_V
+        # hid_to_output_weights: N_V x N_H
+        # embedding_layer: B x 3D
+        # hidden_layer: B x N_H
+        # output_layer: B x N_V
+
         # The matrix with values dC / dz_j, where dz_j is the input to the jth hidden unit,
         # i.e. y_j = 1 / (1 + e^{-z_j})
         hid_deriv = np.dot(loss_derivative, self.params.hid_to_output_weights) \
@@ -251,7 +263,16 @@ class Model(object):
 
 
         ###########################   YOUR CODE HERE  ##############################
-
+        # z = hidden_layer*hid_to_output_weights + output_bias
+        # size of hid_to_output_weights_grad: B x B
+        hid_to_output_weights_grad = np.dot(loss_derivative.T, activations.hidden_layer.T)
+        # size of output_bias_grad: B x N_V
+        output_bias_grad = loss_derivative
+        # size of hid_deriv: B x N_H
+        # size of embedding_layer: B x 3D
+        embed_to_hid_weights_grad = np.dot(hid_deriv.T, embedding_layer.T)
+        # sieze of hid_bias_grad: 
+        hid_bias_grad
 
         ############################################################################
 

@@ -255,24 +255,24 @@ class Model(object):
         # embedding_layer: B x 3D
         # hidden_layer: B x N_H
         # output_layer: B x N_V
+        # embed_to_hid_weights: N_H x 3D
 
         # The matrix with values dC / dz_j, where dz_j is the input to the jth hidden unit,
         # i.e. y_j = 1 / (1 + e^{-z_j})
         hid_deriv = np.dot(loss_derivative, self.params.hid_to_output_weights) \
                     * activations.hidden_layer * (1. - activations.hidden_layer)
 
-
         ###########################   YOUR CODE HERE  ##############################
         # z = hidden_layer*hid_to_output_weights + output_bias
-        # size of hid_to_output_weights_grad: B x B
-        hid_to_output_weights_grad = np.dot(loss_derivative.T, activations.hidden_layer.T)
+        # size of hid_to_output_weights_grad: N_V x N_H
+        hid_to_output_weights_grad = np.dot(loss_derivative.T, activations.hidden_layer)
         # size of output_bias_grad: B x N_V
-        output_bias_grad = loss_derivative
+        output_bias_grad = sum(loss_derivative)
         # size of hid_deriv: B x N_H
         # size of embedding_layer: B x 3D
-        embed_to_hid_weights_grad = np.dot(hid_deriv.T, embedding_layer.T)
-        # sieze of hid_bias_grad: 
-        hid_bias_grad
+        embed_to_hid_weights_grad = np.dot(hid_deriv.T, activations.embedding_layer)
+        # size of hid_bias_grad: B x N_H
+        hid_bias_grad = sum(hid_deriv)
 
         ############################################################################
 

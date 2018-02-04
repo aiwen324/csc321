@@ -180,7 +180,4 @@ def print_gradients():
     
 
     
-    
-    
-
-    
+print_gradients()

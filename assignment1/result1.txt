@@ -1,0 +1,77 @@
+loss_derivative[2, 5] 0.0013789153741
+loss_derivative[2, 121] -0.999459885968
+loss_derivative[5, 33] 0.000391942483563
+loss_derivative[5, 31] -0.708749715825
+
+param_gradient.word_embedding_weights[27, 2] -0.298510438589
+param_gradient.word_embedding_weights[43, 3] -1.13004162742
+param_gradient.word_embedding_weights[22, 4] -0.211118814492
+param_gradient.word_embedding_weights[2, 5] 0.0
+
+param_gradient.embed_to_hid_weights[10, 2] -0.0128399532941
+param_gradient.embed_to_hid_weights[15, 3] 0.0937808780803
+param_gradient.embed_to_hid_weights[30, 9] -0.16837240452
+param_gradient.embed_to_hid_weights[35, 21] 0.0619595914046
+
+param_gradient.hid_bias[10] -0.125907091215
+param_gradient.hid_bias[20] -0.389817847348
+
+param_gradient.output_bias[0] -2.23233392034
+param_gradient.output_bias[1] 0.0333102255428
+param_gradient.output_bias[2] -0.743090094025
+param_gradient.output_bias[3] 0.162372657748
+
+part3
+
+
+
+>>> language_model.find_occurrences('government', 'of', 'united')
+The tri-gram "government of united" did not occur in the training set.
+>>> model.predict_next_word('government','of','united')
+government of united money Prob: 0.13538
+government of united states Prob: 0.09793
+government of united life Prob: 0.05377
+government of united own Prob: 0.04185
+government of united people Prob: 0.03858
+government of united children Prob: 0.03526
+government of united did Prob: 0.03146
+government of united . Prob: 0.02783
+government of united team Prob: 0.02609
+government of united house Prob: 0.02234
+
+>>> model.predict_next_word('city', 'of', 'new')
+city of new york Prob: 0.97203
+city of new . Prob: 0.00600
+city of new life Prob: 0.00232
+city of new days Prob: 0.00216
+city of new one Prob: 0.00132
+city of new , Prob: 0.00117
+city of new ? Prob: 0.00115
+city of new home Prob: 0.00105
+city of new year Prob: 0.00090
+city of new this Prob: 0.00083
+
+>>> model.predict_next_word('life', 'in','the')
+life in the world Prob: 0.21986
+life in the game Prob: 0.08466
+life in the city Prob: 0.06453
+life in the united Prob: 0.05829
+life in the country Prob: 0.05134
+life in the first Prob: 0.03032
+life in the end Prob: 0.03008
+life in the street Prob: 0.02525
+life in the right Prob: 0.02508
+life in the house Prob: 0.02414
+
+>>> model.predict_next_word('he','is','the')
+he is the best Prob: 0.20936
+he is the first Prob: 0.10296
+he is the same Prob: 0.09437
+he is the right Prob: 0.04699
+he is the only Prob: 0.04402
+he is the last Prob: 0.03295
+he is the president Prob: 0.02467
+he is the law Prob: 0.02383
+he is the end Prob: 0.01943
+he is the case Prob: 0.01813
+

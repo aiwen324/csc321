@@ -195,7 +195,34 @@ class CNN(nn.Module):
         padding = kernel // 2
 
         ############### YOUR CODE GOES HERE ############### 
-        #self.downconv1 = ...
+        self.downconv1 = nn.Sequential(
+            MyConv2d(1, num_filters, kernel_size=kernel, padding=padding),
+            nn.MaxPool2d(2),
+            nn.BatchNorm2d(num_filters),
+            nn.ReLU())
+        self.downconv2 = nn.Sequential(
+            MyConv2d(num_filters, num_filters*2, kernel_size=kernel, padding=padding),
+            nn.MaxPool2d(2),
+            nn.BatchNorm2d(num_filters*2),
+            nn.ReLU())
+
+        self.rfconv = nn.Sequential(
+            MyConv2d(num_filters*2, num_filters*2, kernel_size=kernel, padding=padding),
+            nn.BatchNorm2d(num_filters*2),
+            nn.ReLU())
+
+        self.upconv1 = nn.Sequential(
+            MyConv2d(num_filters*2, num_filters, kernel_size=kernel, padding=padding),
+            nn.Upsample(scale_factor=2),
+            nn.BatchNorm2d(num_filters),
+            nn.ReLU())
+        self.upconv2 = nn.Sequential(
+            MyConv2d(num_filters, 24, kernel_size=kernel, padding=padding),
+            nn.Upsample(scale_factor=2),
+            nn.BatchNorm2d(24),
+            nn.ReLU())
+
+        self.finalconv = MyConv2d(24, 24, kernel_size=kernel)
         ###################################################
 
     def forward(self, x):
@@ -212,7 +239,34 @@ class UNet(nn.Module):
         super(UNet, self).__init__()
 
         ############### YOUR CODE GOES HERE ############### 
+        self.downconv1 = nn.Sequential(
+            MyConv2d(1, num_filters, kernel_size=kernel, padding=padding),
+            nn.MaxPool2d(2),
+            nn.BatchNorm2d(num_filters),
+            nn.ReLU())
+        self.downconv2 = nn.Sequential(
+            MyConv2d(num_filters, num_filters*2, kernel_size=kernel, padding=padding),
+            nn.MaxPool2d(2),
+            nn.BatchNorm2d(num_filters*2),
+            nn.ReLU())
 
+        self.rfconv = nn.Sequential(
+            MyConv2d(num_filters*2, num_filters*2, kernel_size=kernel, padding=padding),
+            nn.BatchNorm2d(num_filters*2),
+            nn.ReLU())
+
+        self.upconv1 = nn.Sequential(
+            MyConv2d(num_filters*2, num_filters, kernel_size=kernel, padding=padding),
+            nn.Upsample(scale_factor=2),
+            nn.BatchNorm2d(num_filters),
+            nn.ReLU())
+        self.upconv2 = nn.Sequential(
+            MyConv2d(num_filters, 24, kernel_size=kernel, padding=padding),
+            nn.Upsample(scale_factor=2),
+            nn.BatchNorm2d(24),
+            nn.ReLU())
+
+        self.finalconv = MyConv2d(25, 24, kernel_size=kernel)
         ###################################################
 
     def forward(self, x):

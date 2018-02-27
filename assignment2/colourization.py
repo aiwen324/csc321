@@ -237,7 +237,8 @@ class CNN(nn.Module):
 class UNet(nn.Module):
     def __init__(self, kernel, num_filters, num_colours):
         super(UNet, self).__init__()
-
+        padding = kernel // 2
+        # print("num_filters is:", num_filters)
         ############### YOUR CODE GOES HERE ############### 
         self.downconv1 = nn.Sequential(
             MyConv2d(1, num_filters, kernel_size=kernel, padding=padding),
@@ -255,31 +256,43 @@ class UNet(nn.Module):
             nn.BatchNorm2d(num_filters*2),
             nn.ReLU())
 
+        # Previous layer filters: num_filters*2
+        # Third layer filters: num_filters*2
         self.upconv1 = nn.Sequential(
-            MyConv2d(num_filters*2, num_filters, kernel_size=kernel, padding=padding),
+            MyConv2d(num_filters*4, num_filters, kernel_size=kernel, padding=padding),
             nn.Upsample(scale_factor=2),
             nn.BatchNorm2d(num_filters),
             nn.ReLU())
+        # Second last convolution have output of previous layer and second layer output as input
+        # Previous layer filters: num_filters
+        # Second layer filters: num_filters
         self.upconv2 = nn.Sequential(
-            MyConv2d(num_filters, 24, kernel_size=kernel, padding=padding),
+            MyConv2d(num_filters*2, 24, kernel_size=kernel, padding=padding),
             nn.Upsample(scale_factor=2),
             nn.BatchNorm2d(24),
             nn.ReLU())
-
+        # Final convolution have output of previous layer and initial input as input
+        # Previous layer filters: 24
+        # Initial input: 1
         self.finalconv = MyConv2d(25, 24, kernel_size=kernel)
         ###################################################
 
     def forward(self, x):
         ############### YOUR CODE GOES HERE ############### 
-        #self.out1 = ...
-        #self.out2 = ...
-        #self.out3 = ...
-        #self.out4 = ...
-        #self.out5 = ...
-        #self.out_final = ...
-        #return self.out_final
+        self.out1 = self.downconv1(x)
+        # print(x.shape)
+        # print(self.out1.shape)
+        self.out2 = self.downconv2(self.out1)
+        # print(self.out2.shape)
+        self.out3 = self.rfconv(self.out2)
+        # print(self.out3.shape)
+        self.out4 = self.upconv1(torch.cat((self.out2, self.out3), dim=1))
+        # print(self.out4.shape)
+        self.out5 = self.upconv2(torch.cat((self.out1, self.out4), dim=1))
+        # print(self.out5.shape)
+        self.out_final = self.finalconv(torch.cat((x, self.out5), dim=1))
+        return self.out_final
         ###################################################
-        pass
 
 class DilatedUNet(UNet):
     def __init__(self, kernel, num_filters, num_colours):

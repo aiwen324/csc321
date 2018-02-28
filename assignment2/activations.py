@@ -53,7 +53,10 @@ if __name__ == '__main__':
 
     # Take the idnex of the test image
     id = args.index
-    outdir = args.outdir + str(id)
+    if args.model == "CNN":
+        outdir = args.outdir + "CNN" + str(id)
+    elif args.model == "UNet":
+        outdir = args.outdir + "UNet" + str(id)
     os.mkdir(outdir)
     images, labels = get_torch_vars(np.expand_dims(test_grey[id], 0),
                                     np.expand_dims(test_rgb_cat[id], 0))

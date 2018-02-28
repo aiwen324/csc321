@@ -286,11 +286,11 @@ class UNet(nn.Module):
         # print(self.out2.shape)
         self.out3 = self.rfconv(self.out2)
         # print(self.out3.shape)
-        self.out4 = self.upconv1(torch.cat((self.out2, self.out3), dim=1))
+        self.out4 = self.upconv1(torch.cat((self.out3, self.out2), dim=1))
         # print(self.out4.shape)
-        self.out5 = self.upconv2(torch.cat((self.out1, self.out4), dim=1))
+        self.out5 = self.upconv2(torch.cat((self.out4, self.out1), dim=1))
         # print(self.out5.shape)
-        self.out_final = self.finalconv(torch.cat((x, self.out5), dim=1))
+        self.out_final = self.finalconv(torch.cat((self.out5, x), dim=1))
         return self.out_final
         ###################################################
 

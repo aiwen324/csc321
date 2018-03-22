@@ -23,7 +23,15 @@ import utils
 words = ['roomba',
          'concert',
          'hello',
-         'table'
+         'table',
+         'ai',
+         'bc',
+         'aiyifei',
+         'ac',
+         'io',
+         'roomb',
+         'shfdsa',
+         'shaft'
          # Add your own words here!
         ]
 
@@ -62,3 +70,4 @@ if __name__ == '__main__':
                                      opts)
 
         print('{} --> {}'.format(word, translated))
+        # print word

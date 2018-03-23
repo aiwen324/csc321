@@ -3,7 +3,7 @@ import pdb
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
+# import numpy as np
 # Local imports
 import utils
 
@@ -16,7 +16,12 @@ class MyGRUCell(nn.Module):
         self.hidden_size = hidden_size
 
         # ------------
-        # FILL THIS IN
+        self.W_ir = 
+        self.W_hr = 
+        self.b_r = 
+        self.W_iz = 
+        self.W_hz = 
+        self.b_t = 
         # ------------
 
     def forward(self, x, h_prev):

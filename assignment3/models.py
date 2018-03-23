@@ -37,10 +37,10 @@ class MyGRUCell(nn.Module):
         """
 
         # ------------
-        r = nn.Sigmoid(self.W_ir(x)+self.W_hr(h_prev))
-        z = nn.Sigmoid(self.W_iz(x)+self.W_hz(h_prev))
-        g = nn.Tanh(self.W_in(x)+torch.mul(r, self.W_hn(h_prev)))
-        h_new = torch.mul(torch.ones(z.shape), g) + torch.mul(z, h_prev)
+        r = nn.Sigmoid().forward(self.W_ir(x)+self.W_hr(h_prev))
+        z = nn.Sigmoid().forward(self.W_iz(x)+self.W_hz(h_prev))
+        g = nn.Tanh().forward(self.W_in(x)+torch.mul(r, self.W_hn(h_prev)))
+        h_new = torch.mul(Variable(torch.ones(z.shape))-z, g) + torch.mul(z, h_prev)
         # ------------
         return h_new
 
@@ -102,8 +102,8 @@ class Attention(nn.Module):
 
         # ------------
         self.attention_network = nn.Sequential(
-                                 nn.Linear(hidden_size*2, hidden_size)
-                                 nn.ReLU()
+                                 nn.Linear(hidden_size*2, hidden_size),
+                                 nn.ReLU(),
                                  nn.Linear(hidden_size, 1)
                                  )
         # ------------
@@ -130,12 +130,15 @@ class Attention(nn.Module):
 
         batch_size, seq_len, hid_size = annotations.size()
         expanded_hidden = hidden.unsqueeze(1).expand_as(annotations)
+        # print "expanded_hidden shape is: ", expanded_hidden.shape
+        # print "annotations shape is: ", annotations.shape
         # ------------
         # Concat size: (batch_size x seq_len x 2hidden_sieze)
-        concat = torch.cat(expanded_hidden, annotations, dim=1)
-        reshaped_for_attention_net = concat.view(-1, hid_size)
+        concat = torch.cat((expanded_hidden, annotations), dim=2)
+        reshaped_for_attention_net = concat.view(-1, 2*hid_size)
         attention_net_output = self.attention_network(reshaped_for_attention_net)
-        unnormalized_attention = attention_net_output.view(batch_size, seq_len, hid_size)
+        unnormalized_attention = attention_net_output.view(batch_size, seq_len, 1)
+        # print "unnormalized_attention shape is: ", unnormalized_attention.shape
         # Not the vectorized version!!!
         # attentions = []
         # for i in range(seq_len):
@@ -188,7 +191,18 @@ class AttentionDecoder(nn.Module):
         embed = embed.squeeze(1)     # batch_size x hidden_size
 
         # ------------
-        # FILL THIS IN
+        attention_weights = self.attention(h_prev, annotations)
+        # print "attention_weights shape is: ", attention_weights.shape
+        attention_weights = attention_weights.view(attention_weights.shape[0], 1 , attention_weights.shape[1])
+        # print "annotations shape is: ", annotations.shape
+        # context shape: batch_size x 1 x hidden_size
+        context = torch.matmul(attention_weights, annotations)
+        # print "context shape is: ", context.shape
+        context = context.view(context.shape[0], context.shape[2])
+        embed_and_context = torch.cat((context, embed), dim=1)
+        # print "embed_and_context shape is: ", embed_and_context.shape
+        h_new = self.rnn(embed_and_context, h_prev)
+        output = self.out(h_new)
         # ------------
         # attention_weights = ...
         # context = ...

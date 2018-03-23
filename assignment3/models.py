@@ -3,6 +3,7 @@ import pdb
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.autograd import Variable
 # import numpy as np
 # Local imports
 import utils
@@ -16,12 +17,12 @@ class MyGRUCell(nn.Module):
         self.hidden_size = hidden_size
 
         # ------------
-        self.W_ir = 
-        self.W_hr = 
-        self.b_r = 
-        self.W_iz = 
-        self.W_hz = 
-        self.b_t = 
+        self.W_ir = nn.Linear(input_size, hidden_size)
+        self.W_hr = nn.Linear(hidden_size, hidden_size)
+        self.W_iz = nn.Linear(input_size, hidden_size)
+        self.W_hz = nn.Linear(hidden_size, hidden_size)
+        self.W_in = nn.Linear(input_size, hidden_size, bias=False)
+        self.W_hn = nn.Linear(hidden_size, hidden_size)
         # ------------
 
     def forward(self, x, h_prev):
@@ -36,12 +37,11 @@ class MyGRUCell(nn.Module):
         """
 
         # ------------
-        # FILL THIS IN
+        r = nn.Sigmoid(self.W_ir(x)+self.W_hr(h_prev))
+        z = nn.Sigmoid(self.W_iz(x)+self.W_hz(h_prev))
+        g = nn.Tanh(self.W_in(x)+torch.mul(r, self.W_hn(h_prev)))
+        h_new = torch.mul(torch.ones(z.shape), g) + torch.mul(z, h_prev)
         # ------------
-        # z = ...
-        # r = ...
-        # g = ...
-        # h_new = ...
         return h_new
 
 
@@ -101,7 +101,11 @@ class Attention(nn.Module):
         self.hidden_size = hidden_size
 
         # ------------
-        # FILL THIS IN
+        self.attention_network = nn.Sequential(
+                                 nn.Linear(hidden_size*2, hidden_size)
+                                 nn.ReLU()
+                                 nn.Linear(hidden_size, 1)
+                                 )
         # ------------
 
         # Create a two layer fully-connected network. Hint: Use nn.Sequential
@@ -126,9 +130,21 @@ class Attention(nn.Module):
 
         batch_size, seq_len, hid_size = annotations.size()
         expanded_hidden = hidden.unsqueeze(1).expand_as(annotations)
-
         # ------------
-        # FILL THIS IN
+        # Concat size: (batch_size x seq_len x 2hidden_sieze)
+        concat = torch.cat(expanded_hidden, annotations, dim=1)
+        reshaped_for_attention_net = concat.view(-1, hid_size)
+        attention_net_output = self.attention_network(reshaped_for_attention_net)
+        unnormalized_attention = attention_net_output.view(batch_size, seq_len, hid_size)
+        # Not the vectorized version!!!
+        # attentions = []
+        # for i in range(seq_len):
+        #     # reshaped_for_attention_net is in size batch_size x hidden_size
+        #     reshaped_for_attention_net = concat[:,i,:]
+        #     # the shape of attention_net_output is batch_size x 1
+        #     attention_net_output = self.attention_network(reshaped_for_attention_net)
+        #     attentions.append(attention_net_output)
+        # unnormalized_attention = torch.stack(attentions, dim=1)
         # ------------
 
         # You are free to follow the code template below, or do it a different way,

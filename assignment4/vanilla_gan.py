@@ -159,7 +159,7 @@ def training_loop(train_dataloader, opts):
 
             # FILL THIS IN
             # 1. Compute the discriminator loss on real images
-            D_real_loss = sum((D(real_images)-1)**2) / opts.batch_size
+            D_real_loss = sum((D(real_images)-1)**2) / (2 * opts.batch_size)
 
             # 2. Sample noise
             noise = sample_noise(opts.noise_size)
@@ -168,7 +168,7 @@ def training_loop(train_dataloader, opts):
             fake_images = G(noise)
 
             # 4. Compute the discriminator loss on the fake images
-            D_fake_loss = sum(D(fake_images)**2) / opts.batch_size
+            D_fake_loss = sum(D(fake_images)**2) / (2 * opts.batch_size)
 
             # 5. Compute the total discriminator loss
             D_total_loss = D_real_loss + D_fake_loss

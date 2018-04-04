@@ -103,7 +103,7 @@ class CycleGenerator(nn.Module):
 
         # 3. Define the decoder part of the generator (that builds up the output image from features)
         self.deconv1 = deconv(conv_dim*2, conv_dim, 4)
-        self.deconv2 = deconv(conv_dim, 3, 4)
+        self.deconv2 = deconv(conv_dim, 3, 4, batch_norm=False)
 
     def forward(self, x):
         """Generates an image conditioned on an input image.

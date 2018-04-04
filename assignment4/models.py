@@ -50,6 +50,7 @@ class DCGenerator(nn.Module):
         ###########################################
 
         # self.deconv1 = deconv(...)
+        self.deconv1 = deconv()
         # self.deconv2 = deconv(...)
         # self.deconv3 = deconv(...)
         # self.deconv4 = deconv(...)
